@@ -1,0 +1,61 @@
+.app-header {
+    background-color: rgb(68, 68, 68);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-container {
+    width: 30%;
+}
+
+.search-box-container {
+    width: 40%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-bottom: black;
+}
+
+.login-btn-container {
+    width: 30%;
+    
+}
+
+.app-logo {
+    color: white;
+    float: left;
+    vertical-align: middle;
+    padding: 10px;
+    margin: 8px;
+}
+
+.search-icon {
+    padding: 8px;
+}
+
+.search-box-input {
+    min-width: 250px;
+    padding: 10px;
+}
+
+.login-btn {
+    vertical-align: middle;
+    float: right;
+    padding: 10px;
+    margin: 8px;
+}
+
+.red {
+    color: red;
+}
+
+.dispNone {
+    display: none;
+}
+
+.dispBlock {
+    display: block;
+}
