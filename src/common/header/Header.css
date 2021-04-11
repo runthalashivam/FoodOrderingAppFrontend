@@ -4,9 +4,9 @@
     padding: 10px;
     align-items: center;
     justify-content: space-between;
-  }
-  
-  .app-header-search-box {
+}
+
+.app-header-search-box {
     display: flex;
     /* align-self: center; */
     align-items: center;
@@ -14,46 +14,56 @@
     width: 300px;
     align-self: flex-start;
     height: 40px;
-  }
-  
-  #app-header-search-icon {
+}
+
+#app-header-search-icon {
     height: 27px;
     padding: 0px 0px 0px 10px;
-  }
-  
-  .login-button-icon {
+}
+
+.login-button-icon {
     padding-right: 10px;
-  }
-  
-  .app-logo {
+}
+
+.app-logo {
     padding-left: 10px;
     align-self: center;
-  }
-  
-  @media screen and (max-width:600px) {
+}
+
+@media screen and (max-width:600px) {
     .app-header {
-      flex-direction: column;
-      height: 140px;
-      align-items: flex-start;
-      justify-content: space-between;
+        flex-direction: column;
+        height: 140px;
+        align-items: flex-start;
+        justify-content: space-between;
     }
     .app-logo {
-      align-self: flex-start;
+        align-self: flex-start;
     }
-  }
-  
-  .login-modal-tabs {
+}
+
+.login-modal-tabs {
     margin-bottom: 20px;
-  }
-  
-  .dispNone {
+}
+
+.dispNone {
     display: none;
-  }
-  
-  .dispBlock {
+}
+
+.dispBlock {
     display: block;
-  }
-  
-  .red {
+}
+
+.red {
     color: red;
-  }
+}
+
+.profile-button-icon {
+    padding-right: 10px;
+}
+
+#profile-menu{
+    margin-top: 30px;
+    padding: 0px;
+    margin-left: 20px;
+}

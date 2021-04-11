@@ -14,6 +14,10 @@ import PropTypes from 'prop-types';
 import { FormControl, InputLabel, FormHelperText } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import Fade from '@material-ui/core/Fade';
+import { MenuList } from '@material-ui/core';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { Link } from 'react-router-dom';
 import './Header.css';
 
 const styles = (theme => ({
@@ -34,6 +38,21 @@ const styles = (theme => ({
     },
     formControl: {
         "width": "80%",
+    },
+    profileButton: {
+        color: "#c2c2c2",
+        "text-transform": "none",
+        "font-weight": 400,
+    },
+    menuItems: {  //Style for the menu items 
+        "text-decoration": "none",
+        "color": "black",
+        "text-decoration-underline": "none",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+    },
+    menuList: { //Styling for the menulist component
+        padding: "0px"
     }
 }))
 const customStyles = {
@@ -65,6 +84,7 @@ class Header extends Component {
         console.log(this.props);
         this.state = {
             isModalOpen: false,
+            menuIsOpen: false,
             value: 0,
             loginContactNo: "",
             loginContactNoRequired: "dispNone",
@@ -135,6 +155,16 @@ class Header extends Component {
         })
     }
 
+    openMenu = () => this.setState({
+        ...this.state,
+        menuIsOpen: !this.state.menuIsOpen
+    })
+
+    profileButtonClickHandler = (event) => {
+        this.state.anchorEl ? this.setState({ anchorEl: null }) : this.setState({ anchorEl: event.currentTarget });
+        this.openMenu();
+    };
+
     inputLoginContactNoChangeHandler = (event) => {
         this.setState({
             ...this.state,
@@ -194,11 +224,13 @@ class Header extends Component {
             xhrLogin.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
                     if (xhrLogin.status === 200) {
+                        let loginResponse = JSON.parse(this.responseText);
                         sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
                         sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
                         that.setState({
                             ...that.state,
                             loggedIn: true,
+                            firstName: loginResponse.first_name,
                             snackBarMessage: "Logged in successfully!",
                             snackBarOpen: true,
                         })
@@ -394,7 +426,6 @@ class Header extends Component {
         return false;
     }
 
-
     snackBarClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -421,10 +452,24 @@ class Header extends Component {
                             }
                             fullWidth={true} placeholder="Search by Restaurant Name" />
                     </span>
-                    <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
-                        <AccountCircle className="login-button-icon" />
-          LOGIN
-        </Button>
+                    {this.state.loggedIn !== true ?
+                        <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler} >
+                            <AccountCircle className="login-button-icon" />
+                            LOGIN
+                            </Button>
+                        : <Button className={classes.profileButton} size="large" variant="text" onClick={this.profileButtonClickHandler}>
+                            <AccountCircle className="profile-button-icon" htmlColor="#c2c2c2" />
+                            {this.state.firstName}
+                        </Button>
+                    }
+                    <Menu id="profile-menu" anchorEl={this.state.anchorEl} open={this.state.menuIsOpen} onClose={this.profileButtonClickHandler}>
+                        <MenuList className={classes.menuList}>
+                            <Link to={"/profile"} className={classes.menuItems} underline="none" color={"default"}>
+                                <MenuItem className={classes.menuItems} onClick={this.onMyProfileClicked} disableGutters={false}>My profile</MenuItem>
+                            </Link>
+                            <MenuItem className="menu-items" onClick={this.onLogOutClicked}>Logout</MenuItem>
+                        </MenuList>
+                    </Menu>
                 </header>
                 <Modal
                     ariaHideApp={false}
