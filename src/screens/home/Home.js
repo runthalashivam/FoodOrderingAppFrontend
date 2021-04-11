@@ -8,7 +8,7 @@ class Home extends Component {
     render() {
         return(
             <div>
-                <Header />
+                <Header  baseUrl={this.props.baseUrl}/>
             </div>
         );
     }
