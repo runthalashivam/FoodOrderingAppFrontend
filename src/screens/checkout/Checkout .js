@@ -270,18 +270,20 @@ class Checkout extends Component {
       if (xhrAddress.readyState === 4 && xhrAddress.status === 200) {
         let responseAddresses = JSON.parse(xhrAddress.responseText).addresses;
         let addresses = [];
-        responseAddresses.forEach(responseAddress => {
-          let address = {
-            id: responseAddress.id,
-            city: responseAddress.city,
-            flatBuildingName: responseAddress.flat_building_name,
-            locality: responseAddress.locality,
-            pincode: responseAddress.pincode,
-            state: responseAddress.state,
-            selected: false,
-          }
-          addresses.push(address)
-        })
+        if (responseAddresses && responseAddresses.length > 0) {
+          responseAddresses.forEach(responseAddress => {
+            let address = {
+              id: responseAddress.id,
+              city: responseAddress.city,
+              flatBuildingName: responseAddress.flat_building_name,
+              locality: responseAddress.locality,
+              pincode: responseAddress.pincode,
+              state: responseAddress.state,
+              selected: false,
+            }
+            addresses.push(address)
+          })
+        }
         that.setState({
           ...that.state,
           addresses: addresses
