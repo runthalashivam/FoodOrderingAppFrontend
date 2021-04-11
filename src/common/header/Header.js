@@ -60,8 +60,9 @@ TabContainer.propTypes = {
 
 class Header extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+        console.log(this.props);
         this.state = {
             isModalOpen: false,
             value: 0,
@@ -74,11 +75,12 @@ class Header extends Component {
             lastName: "",
             email: "",
             emailRequired: "dispNone",
+            invalidEmail: "dispNone",
             signUpPassword: "",
             signUpPasswordRequired: "dispNone",
             signUpContactNo: "",
             signUpContactNoRequired: "dispNone",
-            inValidContact: "dispNone",
+            inValidLoginContact: "dispNone",
             invalidPassword: "dispNone",
             notRegisteredContact: "dispNone",
             validPasswordHelpText: "dispNone",
@@ -95,7 +97,27 @@ class Header extends Component {
     closeModalHandler = () => {
         this.setState({
             ...this.state,
-            isModalOpen: false
+            isModalOpen: true,
+            loginContactNo: "",
+            loginContactNoRequired: "dispNone",
+            loginPassword: "",
+            loginPasswordRequired: "dispNone",
+            firstName: "",
+            firstNameRequired: "dispNone",
+            lastName: "",
+            email: "",
+            emailRequired: "dispNone",
+            invalidEmail: "dispNone",
+            signUpPassword: "",
+            signUpPasswordRequired: "dispNone",
+            signUpContactNo: "",
+            signUpContactNoRequired: "dispNone",
+            inValidLoginContact: "dispNone",
+            invalidPassword: "dispNone",
+            notRegisteredContact: "dispNone",
+            validPasswordHelpText: "dispNone",
+            contactNoRegistered: "dispNone",
+            contactHelpText: "dispNone",
         })
     }
 
@@ -165,33 +187,41 @@ class Header extends Component {
     }
 
     loginClickHandler = () => {
-        this.state.loginContactNo === "" ? this.setState({ loginContactNoRequired: "dispBlock" }) : this.setState({ loginContactNoRequired: "dispNone" });
-        this.state.loginPassword === "" ? this.setState({ loginPasswordRequired: "dispBlock" }) : this.setState({ loginPasswordRequired: "dispNone" });
-        if (this.state.loginContactNo !== "") {
-            var contactNo = "[7-9][0-9]{9}";
-            this.state.loginContactNo.match(contactNo) ? this.setState({ inValidContact: "dispNone" }) : this.setState({ inValidContact: "dispBlock" });
-        }
-        if (this.state.inValidContact === "dispNone" && this.state.loginPassword !== "") {
+        if (this.handleLoginFormValidation()) {
             let dataLogin = null;
             let xhrLogin = new XMLHttpRequest();
             let that = this;
             xhrLogin.addEventListener("readystatechange", function () {
-                if (this.readyState === 4 ) {
-                    var parseData = JSON.parse(this.responseText)
-                    console.log(xhrLogin.status)
-                    console.log(parseData);
-                    sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
-                    sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
-                    console.log(xhrLogin.getResponseHeader("access-token"))
-
-                    that.setState({
-                        ...this.state,
-                        snackBarMessage: "Logged in successfully!",
-                        snackBarOpen: true,
-                    })
-                    that.closeModalHandler();
+                if (this.readyState === 4) {
+                    if (xhrLogin.status === 200) {
+                        sessionStorage.setItem("uuid", JSON.parse(this.responseText).id);
+                        sessionStorage.setItem("access-token", xhrLogin.getResponseHeader("access-token"));
+                        that.setState({
+                            ...that.state,
+                            loggedIn: true,
+                            snackBarMessage: "Logged in successfully!",
+                            snackBarOpen: true,
+                        })
+                        that.closeModalHandler();
+                    } else if (xhrLogin.status === 401) {
+                        let loginResponse = JSON.parse(this.responseText);
+                        let notRegisteredContact = "dispNone"
+                        let invalidPassword = "dispNone"
+                        if (loginResponse.code === 'ATH-001') {
+                            notRegisteredContact = "dispBlock"
+                        }
+                        if (loginResponse.code === 'ATH-002') {
+                            invalidPassword = "dispBlock"
+                        }
+                        that.setState({
+                            ...that.state,
+                            notRegisteredContact: notRegisteredContact,
+                            invalidPassword: invalidPassword,
+                        })
+                    }
                 }
             })
+            console.log(this.props.baseUrl + "customer/login");
             xhrLogin.open("POST", this.props.baseUrl + "customer/login");
             xhrLogin.setRequestHeader("Authorization", "Basic " + window.btoa(this.state.loginContactNo + ":" + this.state.loginPassword));
             xhrLogin.setRequestHeader("Content-Type", "application/json");
@@ -200,16 +230,169 @@ class Header extends Component {
         }
     }
 
-    signUpClickHandler = () => {
+    handleLoginFormValidation = () => {
+        let loginContactNoRequired = "dispNone";
+        let loginPasswordRequired = "dispNone";
+        let inValidLoginContact = "dispNone";
+        let isFormValid = true;
+        if (this.state.loginContactNo === "") {
+            loginContactNoRequired = "dispBlock";
+            isFormValid = false;
+        }
+        if (this.state.loginPassword === "") {
+            loginPasswordRequired = "dispBlock"
+            isFormValid = false;
+        }
+        if (this.state.loginContactNo !== "") {
+            var contactNo = "[7-9][0-9]{9}";
+            if (!this.state.loginContactNo.match(contactNo)) {
+                inValidLoginContact = "dispBlock"
+                isFormValid = false;
+            }
+        }
         this.setState({
-            ...this.state,
-            value: 0,
-            snackBarMessage: "Registered successfully! Please login now!",
-            snackBarOpen: true,
+            loginContactNoRequired: loginContactNoRequired,
+            loginPasswordRequired: loginPasswordRequired,
+            inValidLoginContact: inValidLoginContact
         })
+        return (isFormValid);
+    }
+
+    signUpClickHandler = () => {
+        if (this.signUpFormValidation()) {
+            let dataSignUp = JSON.stringify({
+                "contact_number": this.state.signUpContactNo,
+                "email_address": this.state.email,
+                "first_name": this.state.firstName,
+                "last_name": this.state.lastName,
+                "password": this.state.signUpPassword
+            });
+
+            let xhrSignUp = new XMLHttpRequest();
+            let that = this;
+            xhrSignUp.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    if (xhrSignUp.status === 201) {
+                        that.setState({
+                            ...that.state,
+                            value: 0,
+                            snackBarMessage: "Registered successfully! Please login now!",
+                            snackBarOpen: true,
+                        })
+                    }
+                    if (xhrSignUp.status === 400) {
+                        let responseData = JSON.parse(this.responseText)
+                        if (responseData.code === 'SGR-001') {
+                            that.setState({
+                                ...that.state,
+                                contactNoRegistered: "dispBlock"
+                            })
+                        }
+                    }
+                }
+            });
+            console.log(this.props.baseUrl + "customer/signup");
+            xhrSignUp.open("POST", this.props.baseUrl + "customer/signup");
+            xhrSignUp.setRequestHeader("Content-Type", "application/json");
+            xhrSignUp.setRequestHeader("Cache-Control", "no-cache");
+            xhrSignUp.send(dataSignUp);
+        }
+    }
+
+    signUpFormValidation = () => {
+        let firstNameRequired = "dispNone";
+        let emailRequired = "dispNone";
+        let signUpPasswordRequired = "dispNone";
+        let signUpContactNoRequired = "dispNone";
+        let validPasswordHelpText = "dispNone";
+        let contactHelpText = "dispNone";
+        let invalidEmail = "dispNone";
+        let signUpFormValid = true;
+
+        if (this.state.firstName === "") {
+            firstNameRequired = "dispBlock";
+            signUpFormValid = false;
+        }
+        if (this.state.email === "") {
+            emailRequired = "dispBlock";
+            signUpFormValid = false;
+        }
+        if (this.state.email !== "") {
+
+            if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w+)+$/.test(this.state.email))) {
+                invalidEmail = "dispBlock"
+                signUpFormValid = false;
+            }
+        }
+        if (this.state.signUpContactNo === "") {
+            signUpContactNoRequired = "dispBlock";
+            signUpFormValid = false;
+        }
+        if (this.state.signUpContactNo !== "") {
+            var contactNo = "[7-9][0-9]{9}";
+            if (!this.state.signUpContactNo.match(contactNo)) {
+                contactHelpText = "dispBlock"
+                signUpFormValid = false;
+            }
+        }
+        if (this.state.signUpPassword === "") {
+            signUpPasswordRequired = "dispBlock";
+            signUpFormValid = false;
+        }
+        if (this.state.signUpPassword !== "") {
+            if (!this.isValidPassword(this.state.signUpPassword)) {
+                validPasswordHelpText = "dispBlock"
+                signUpFormValid = false;
+
+            }
+        }
+        this.setState({
+            firstNameRequired: firstNameRequired,
+            emailRequired: emailRequired,
+            contactHelpText: contactHelpText,
+            signUpPasswordRequired: signUpPasswordRequired,
+            signUpContactNoRequired: signUpContactNoRequired,
+            invalidEmail: invalidEmail,
+            validPasswordHelpText: validPasswordHelpText,
+        })
+        return (signUpFormValid);
 
     }
 
+    isValidPassword = (password) => {
+        let lowerCase = false;
+        let upperCase = false;
+        let number = false;
+        let specialCharacter = false;
+
+
+        if (password.length < 8) {
+            return false;
+        }
+
+        if (password.match("(?=.*[0-9]).*")) {
+            number = true;
+        }
+
+        if (password.match("(?=.*[a-z]).*")) {
+            lowerCase = true;
+        }
+        if (password.match("(?=.*[A-Z]).*")) {
+            upperCase = true;
+        }
+        if (password.match("(?=.*[#@$%&*!^]).*")) {
+            specialCharacter = true;
+        }
+
+        if (lowerCase && upperCase) {
+            if (specialCharacter && number) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+        return false;
+    }
 
 
     snackBarClose = (event, reason) => {
@@ -238,8 +421,8 @@ class Header extends Component {
                             }
                             fullWidth={true} placeholder="Search by Restaurant Name" />
                     </span>
-                    <Button className={classes.loginButton} size="large" variant="contained">
-                        <AccountCircle className="login-button-icon" onClick={this.loginButtonClickHandler} />
+                    <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler}>
+                        <AccountCircle className="login-button-icon" />
           LOGIN
         </Button>
                 </header>
@@ -258,7 +441,7 @@ class Header extends Component {
                         <TabContainer>
                             <FormControl required className={classes.formControl}>
                                 <InputLabel htmlFor="login-contact-no">Contact No.</InputLabel>
-                                <Input id="login-contact-no" className="input-fields" fullWidth={true} type="text" logincontactno={this.state.loginContactNo} onChange={this.inputLoginContactNoChangeHandler}  value={this.state.loginContactNo} />
+                                <Input id="login-contact-no" className="input-fields" fullWidth={true} type="text" logincontactno={this.state.loginContactNo} onChange={this.inputLoginContactNoChangeHandler} value={this.state.loginContactNo} />
                                 <FormHelperText className={this.state.loginContactNoRequired}>
                                     <span className='red'>required</span>
                                 </FormHelperText>
@@ -315,7 +498,7 @@ class Header extends Component {
                             <br />
                             <FormControl required className={classes.formControl}>
                                 <InputLabel htmlFor="sign-up-password">Password</InputLabel>
-                                <Input id="sign-up-password" className="input-fields"  type="password" signuppassword={this.state.signUpPassword} fullWidth={true} onChange={this.inputSignUpPasswordChangeHandler} value={this.state.signUpPassword} />
+                                <Input id="sign-up-password" className="input-fields" type="password" signuppassword={this.state.signUpPassword} fullWidth={true} onChange={this.inputSignUpPasswordChangeHandler} value={this.state.signUpPassword} />
                                 <FormHelperText className={this.state.signUpPasswordRequired}>
                                     <span className="red">required</span>
                                 </FormHelperText>
