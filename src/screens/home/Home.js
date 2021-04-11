@@ -107,7 +107,6 @@ class Home extends Component {
         xhrRestaurant.addEventListener("readystatechange", function () {
             if (xhrRestaurant.readyState === 4 && xhrRestaurant.status === 200) {
                 let restaurant = JSON.parse(xhrRestaurant.responseText)
-                console.log(restaurant.restaurants)
                 that.setState({
                     restaurant: restaurant.restaurants
                 });

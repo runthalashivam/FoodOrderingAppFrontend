@@ -81,7 +81,6 @@ class Header extends Component {
 
     constructor(props) {
         super(props);
-        console.log(this.props);
         this.state = {
             isModalOpen: false,
             menuIsOpen: false,
@@ -254,7 +253,6 @@ class Header extends Component {
                     }
                 }
             })
-            console.log(this.props.baseUrl + "customer/login");
             xhrLogin.open("POST", this.props.baseUrl + "customer/login");
             xhrLogin.setRequestHeader("Authorization", "Basic " + window.btoa(this.state.loginContactNo + ":" + this.state.loginPassword));
             xhrLogin.setRequestHeader("Content-Type", "application/json");
@@ -324,7 +322,6 @@ class Header extends Component {
                     }
                 }
             });
-            console.log(this.props.baseUrl + "customer/signup");
             xhrSignUp.open("POST", this.props.baseUrl + "customer/signup");
             xhrSignUp.setRequestHeader("Content-Type", "application/json");
             xhrSignUp.setRequestHeader("Cache-Control", "no-cache");
