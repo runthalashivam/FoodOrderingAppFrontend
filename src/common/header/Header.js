@@ -109,7 +109,8 @@ class Header extends Component {
             snackBarOpen: false,
             snackBarMessage: "",
             transition: Fade,
-            loggedIn: false,
+            loggedIn: sessionStorage.getItem('access-token') === null ? false : true,
+            loggedInName: sessionStorage.getItem('customer-name'),
         }
 
     }
@@ -230,7 +231,7 @@ class Header extends Component {
                         that.setState({
                             ...that.state,
                             loggedIn: true,
-                            firstName: loginResponse.first_name,
+                            loggedInName: loginResponse.first_name,
                             snackBarMessage: "Logged in successfully!",
                             snackBarOpen: true,
                         })
@@ -437,13 +438,17 @@ class Header extends Component {
         })
     }
 
+    onLogOutClickHandler = () => {
+
+    }
+
     render() {
         const { classes } = this.props;
         return (
             <div>
                 <header className="app-header">
                     <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
-                    {this.props.showHeaderSearchBox === true && 
+                    {this.props.showHeaderSearchBox === true &&
                         <span className="app-header-search-box">
                             <Input className={classes.searchText}
                                 startAdornment={
@@ -461,7 +466,7 @@ class Header extends Component {
                             </Button>
                         : <Button className={classes.profileButton} size="large" variant="text" onClick={this.profileButtonClickHandler}>
                             <AccountCircle className="profile-button-icon" htmlColor="#c2c2c2" />
-                            {this.state.firstName}
+                            {this.state.loggedInName}
                         </Button>
                     }
                     <Menu id="profile-menu" anchorEl={this.state.anchorEl} open={this.state.menuIsOpen} onClose={this.profileButtonClickHandler}>
@@ -469,7 +474,7 @@ class Header extends Component {
                             <Link to={"/profile"} className={classes.menuItems} underline="none" color={"default"}>
                                 <MenuItem className={classes.menuItems} onClick={this.onMyProfileClicked} disableGutters={false}>My profile</MenuItem>
                             </Link>
-                            <MenuItem className="menu-items" onClick={this.onLogOutClicked}>Logout</MenuItem>
+                            <MenuItem className="menu-items" onClick={this.onLogOutClickHandler}>Logout</MenuItem>
                         </MenuList>
                     </Menu>
                 </header>

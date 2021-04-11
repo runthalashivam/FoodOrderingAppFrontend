@@ -235,7 +235,7 @@ class Details extends Component {
       })
     } else {
       this.props.history.push({
-        pathname: '/checkout/' + this.props.match.params.id,
+        pathname: '/checkout/',
         cartItems: this.state.cartItems,
         restaurantDetails: this.state.restaurantDetails,
       })
