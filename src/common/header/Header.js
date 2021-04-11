@@ -464,6 +464,29 @@ class Header extends Component {
         xhrLogout.send(logoutData);
     }
 
+    inputSearchChangeHandler = (event) => {
+        let searchOn = true
+        if (!(event.target.value === "")) {
+            let dataRestaurant = null;
+            let that = this
+            let xhrSearchRestaurant = new XMLHttpRequest();
+            xhrSearchRestaurant.addEventListener("readystatechange", function () {
+                if (xhrSearchRestaurant.readyState === 4 && xhrSearchRestaurant.status === 200) {
+                    var restaurant = JSON.parse(this.responseText).restaurants;
+                    that.props.updateSearchRestaurant(restaurant, searchOn);
+                }
+            })
+            xhrSearchRestaurant.open('GET', this.props.baseUrl + 'restaurant/name/' + event.target.value)
+            xhrSearchRestaurant.setRequestHeader("Content-Type", "application/json");
+            xhrSearchRestaurant.setRequestHeader("Cache-Control", "no-cache");
+            xhrSearchRestaurant.send(dataRestaurant);
+        } else {
+            let restaurant = [];
+            searchOn = false
+            this.props.updateSearchRestaurant(restaurant, searchOn);
+        }
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -478,7 +501,7 @@ class Header extends Component {
                                         <SearchIcon id="app-header-search-icon" htmlColor="white"></SearchIcon>
                                     </InputAdornment>
                                 }
-                                fullWidth={true} placeholder="Search by Restaurant Name" />
+                                fullWidth={true} placeholder="Search by Restaurant Name" onChange={this.inputSearchChangeHandler} />
                         </span>
                     }
                     {this.state.loggedIn !== true ?

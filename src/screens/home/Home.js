@@ -121,15 +121,40 @@ class Home extends Component {
         this.props.history.push('/restaurant/' + restaurantId);
     }
 
+    updateSearchRestaurant = (searchRestaurant, searchOn) => {
+        let allRestaurantData = [];
+        if (searchOn) {
+            if (!this.state.isSearchOn) {
+                allRestaurantData = this.state.restaurant;
+                this.setState({
+                    restaurant: searchRestaurant,
+                    allRestaurantData: allRestaurantData,
+                    isSearchOn: true,
+                })
+            } else {
+                this.setState({
+                    ...this.state,
+                    restaurant: searchRestaurant,
+                })
+            }
+        } else {
+            allRestaurantData = this.state.allRestaurantData;
+            this.setState({
+                restaurant: allRestaurantData,
+                isSearchOn: false,
+            });
+        }
+    }
+
     render() {
         const { classes } = this.props;
         return (
             <div>
 
-                <Header baseUrl={this.props.baseUrl}  showHeaderSearchBox={true} />
+                <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={true} updateSearchRestaurant={this.updateSearchRestaurant}></Header>
                 <div className="flex-container">
                     <Grid container spacing={3} wrap="wrap" alignContent="center" className={classes.grid}>
-                        {this.state.restaurant.map(restaurant => (
+                        {this.state.restaurant !== null ? this.state.restaurant.map(restaurant => (
                             <Grid key={restaurant.id} item xs={12} sm={6} md={3} className={classes.gridCard}>
                                 <Card className={classes.card}>
                                     <CardActionArea className={classes.cardActionArea} onClick={() => this.restaurantCardClicked(restaurant.id)}>
@@ -144,7 +169,7 @@ class Home extends Component {
                                             </Typography>
                                         </CardContent>
                                         <CardContent className={classes.cardContent}>
-                                            <Typography variant="subtitle1" component="p"  className = {classes.categories}>
+                                            <Typography variant="subtitle1" component="p" className={classes.categories}>
                                                 {restaurant.categories}
                                             </Typography>
                                         </CardContent>
@@ -169,7 +194,9 @@ class Home extends Component {
                                     </CardActionArea>
                                 </Card>
                             </Grid>
-                        ))}
+                        ))
+                            : <Typography variant="body1" component="p">No restaurant with given name.</Typography>
+                        }
                     </Grid>
                 </div>
             </div>
