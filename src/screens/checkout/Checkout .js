@@ -60,7 +60,6 @@ const styles = (theme => ({
     '@media(max-width:600px)': {
       width: '50%',
     }
-
   },
   addressCheckButton: {
     'float': 'right',
@@ -224,39 +223,43 @@ class Checkout extends Component {
 
   componentDidMount() {
 
-    this.getAllAddress();
+    if (this.state.isLoggedIn) {
+      this.getAllAddress();
 
-    let statesData = null;
-    let xhrStates = new XMLHttpRequest();
-    let that = this;
-    xhrStates.addEventListener("readystatechange", function () {
-      if (xhrStates.readyState === 4 && xhrStates.status === 200) {
-        let states = JSON.parse(xhrStates.responseText).states;
-        that.setState({
-          ...that.state,
-          states: states,
-        })
-      }
-    })
 
-    xhrStates.open('GET', this.props.baseUrl + 'states');
-    xhrStates.send(statesData);
+      let statesData = null;
+      let xhrStates = new XMLHttpRequest();
+      let that = this;
+      xhrStates.addEventListener("readystatechange", function () {
+        if (xhrStates.readyState === 4 && xhrStates.status === 200) {
+          let states = JSON.parse(xhrStates.responseText).states;
+          that.setState({
+            ...that.state,
+            states: states,
+          })
+        }
+      })
 
-    let paymentData = null;
-    let xhrPayment = new XMLHttpRequest();
-    xhrPayment.addEventListener("readystatechange", function () {
-      if (xhrPayment.readyState === 4 && xhrPayment.status === 200) {
-        let payment = JSON.parse(xhrPayment.responseText).paymentMethods;
-        that.setState({
-          ...that.state,
-          payment: payment,
-        })
-      }
-    })
+      xhrStates.open('GET', this.props.baseUrl + 'states');
+      xhrStates.send(statesData);
 
-    xhrPayment.open('GET', this.props.baseUrl + 'payment');
-    xhrPayment.send(paymentData);
+      let paymentData = null;
+      let xhrPayment = new XMLHttpRequest();
+      xhrPayment.addEventListener("readystatechange", function () {
+        if (xhrPayment.readyState === 4 && xhrPayment.status === 200) {
+          let payment = JSON.parse(xhrPayment.responseText).paymentMethods;
+          that.setState({
+            ...that.state,
+            payment: payment,
+          })
+        }
+      })
+
+      xhrPayment.open('GET', this.props.baseUrl + 'payment');
+      xhrPayment.send(paymentData);
+    }
   }
+
 
   getAllAddress = () => {
     let data = null;
@@ -556,13 +559,19 @@ class Checkout extends Component {
       return <Redirect to="/" />
     }
   }
+  afterLogoutRedirectToHome = () => {
+    this.setState({
+      ...this.state,
+      isLoggedIn: false,
+    })
+  }
 
   render() {
     const { classes } = this.props;
     return (
       <div>
         {this.redirectToHome()}
-        <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} />
+        <Header baseUrl={this.props.baseUrl} showHeaderSearchBox={false} logoutRedirect={this.afterLogoutRedirectToHome} />
         <div className="checkout-container">
           <div className="stepper-container">
             <Stepper activeStep={this.state.activeStep} orientation="vertical" className={classes.stepper}>

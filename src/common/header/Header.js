@@ -439,7 +439,29 @@ class Header extends Component {
     }
 
     onLogOutClickHandler = () => {
+        let logoutData = null;
+        let that = this
+        let xhrLogout = new XMLHttpRequest();
+        xhrLogout.addEventListener("readystatechange", function () {
+            if (xhrLogout.readyState === 4 && xhrLogout.status === 200) {
+                sessionStorage.removeItem("uuid");
+                sessionStorage.removeItem("access-token");
+                sessionStorage.removeItem("customer-name");
+                that.setState({
+                    ...that.state,
+                    loggedIn: false,
+                    menuIsOpen: !that.state.menuIsOpen,
+                });
 
+                if (that.props.logoutRedirect) {
+                    that.props.logoutRedirect();
+                }
+            }
+
+        })
+        xhrLogout.open('POST', this.props.baseUrl + 'customer/logout');
+        xhrLogout.setRequestHeader('authorization', 'Bearer ' + sessionStorage.getItem('access-token'));
+        xhrLogout.send(logoutData);
     }
 
     render() {
