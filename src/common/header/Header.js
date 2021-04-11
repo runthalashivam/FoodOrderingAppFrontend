@@ -351,7 +351,7 @@ class Header extends Component {
         }
         if (this.state.email !== "") {
 
-            if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w+)+$/.test(this.state.email))) {
+            if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w+)+$/.test(this.state.email))) {
                 invalidEmail = "dispBlock"
                 signUpFormValid = false;
             }
@@ -443,15 +443,17 @@ class Header extends Component {
             <div>
                 <header className="app-header">
                     <FastfoodIcon className="app-logo" fontSize="large" htmlColor="white" />
-                    <span className="app-header-search-box">
-                        <Input className={classes.searchText}
-                            startAdornment={
-                                <InputAdornment position="start">
-                                    <SearchIcon id="app-header-search-icon" htmlColor="white"></SearchIcon>
-                                </InputAdornment>
-                            }
-                            fullWidth={true} placeholder="Search by Restaurant Name" />
-                    </span>
+                    {this.props.showHeaderSearchBox === true && 
+                        <span className="app-header-search-box">
+                            <Input className={classes.searchText}
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <SearchIcon id="app-header-search-icon" htmlColor="white"></SearchIcon>
+                                    </InputAdornment>
+                                }
+                                fullWidth={true} placeholder="Search by Restaurant Name" />
+                        </span>
+                    }
                     {this.state.loggedIn !== true ?
                         <Button className={classes.loginButton} size="large" variant="contained" onClick={this.loginButtonClickHandler} >
                             <AccountCircle className="login-button-icon" />
