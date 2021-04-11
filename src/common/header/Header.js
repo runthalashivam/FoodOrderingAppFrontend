@@ -539,7 +539,7 @@ class Header extends Component {
                                 <FormHelperText className={this.state.loginContactNoRequired}>
                                     <span className='red'>required</span>
                                 </FormHelperText>
-                                <FormHelperText className={this.state.inValidContact}>
+                                <FormHelperText className={this.state.inValidLoginContact}>
                                     <span className="red">Invalid Contact</span>
                                 </FormHelperText>
                             </FormControl>
